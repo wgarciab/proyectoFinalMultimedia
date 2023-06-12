@@ -4,6 +4,7 @@ import processing.sound.*;
 //Importación de la librería de osc
 import netP5.*;
 import oscP5.*;
+import processing.video.*;
 
 // A Sample object (for a sound)
 SoundFile song1;
@@ -13,8 +14,9 @@ SoundFile song4;
 
 Amplitude analyzer;
 Amplitude micAnalyzer;
+AudioIn audioIn;
+//Capture videoCapture;
 
-//comentario
 
 // Estrellas
 int NUM_STARS = 50;
@@ -106,11 +108,21 @@ void setup() {
   song4 = new SoundFile(this, "breathy-vocal-yo.wav");
   song4.loop(); 
   
+  audioIn = new AudioIn(this,0);
+  // this is how we intialyzed the reading of the voice 
+  audioIn.start();
+  
+  //Initialize camara recording variable
+  //videoCapture = new Capture(this,width, height);
+  //videoCapture.start();
+  
    // create a new Amplitude analyzer
   analyzer = new Amplitude(this);
-
+  micAnalyzer = new Amplitude(this);
+  
   // Patch the input to an volume analyzer
   analyzer.input(song2);
+  micAnalyzer.input(audioIn);
   
   // Cambio modo de color
   
@@ -153,7 +165,7 @@ void setup() {
   }
   
   frameRate(100);
-  
+   //<>//
   centerXTranslate = width/2;
   centerYTranslate = height/2;
   
@@ -164,17 +176,22 @@ void setup() {
 
 boolean playing1 = true;
 boolean playing2 = true;
-boolean playing3 = true;
+boolean playing3 = true; //<>//
 boolean playing4 = true;
 
 void draw() { //<>//
   
   background(0);
+  //This two lines make the actual readd of the audio and then 
+  // zoom the camara in and out accordign to the intesity of tha audio.
+  float microPhoneVolumen =micAnalyzer.analyze();
+  camera(width/2, height/2, (height/2) / tan(PI/6)+microPhoneVolumen*2000, width/2, height/2, 0, 0, 1, 0);
   
-  
+  //process the video capture from the camara
+  // videoCapture.loadPixels();
+   //image(videoCapture,0,0);
   
   // Parte del centro
-  
   float acc = map(mouseX, 0, width, 0.005f, 0.2f);
   
   if (playing4 == true) {
@@ -452,3 +469,9 @@ void oscEvent(OscMessage oscMessage) {
     
     
   }
+ /** 
+  void captureEvent(Capture video) {
+  // Read image from the camera
+  video.read();
+}
+**/
