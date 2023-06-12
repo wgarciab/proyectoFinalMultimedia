@@ -53,9 +53,11 @@ public class OrbitItem{
   
   public void display(){
     
+    float vol = micAnalyzer.analyze();
+    
     this.sat += this.saltoS;
         
-    strokeWeight(3);
+    strokeWeight(3+vol*100);
     stroke(this.hue, this.sat, brightness, this.alpha);
     noFill();
         

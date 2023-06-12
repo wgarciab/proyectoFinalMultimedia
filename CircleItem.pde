@@ -62,7 +62,7 @@ class CircleItem{
     pushMatrix();
     translate(this.xPos, this.yPos, 0);
     lights();
-    sphere(20 + vol*30);
+    sphere(20 + vol*20);
     popMatrix();
     
     
@@ -173,6 +173,10 @@ class CircleItem{
   
   }
   
-  
+  public void actualizaRadio(){
+    float volMic = micAnalyzer.analyze();
+    this.xPos = int((200 + volMic*300)*cos(this.posicion*30*(PI/180)));
+    this.yPos = int((200 + volMic*300)*sin(this.posicion*30*(PI/180)));
+  }
   
 }

@@ -1,9 +1,15 @@
 //Importación de la librería de Audio
 import processing.sound.*;
+AudioIn in;
 
 //Importación de la librería de osc
 import netP5.*;
 import oscP5.*;
+
+import processing.video.*;
+
+// Variable for capture device
+Capture video;
 
 // A Sample object (for a sound)
 SoundFile song1;
@@ -40,8 +46,8 @@ float radio = 200;
 
 // Se inicializan los colores
 
-int saturation = 85;
-int brightness = 150;
+int saturation = 60;
+int brightness = 80;
 
 float [] colors = new float[num_circles];
 
@@ -92,17 +98,26 @@ void setup() {
   
   OscP5 oscP5 = new OscP5(this, 11111);
   
+  //video = new Capture(this, width, height);
+  //video.start();
+  
+  in = new AudioIn(this, 0);
+  in.start();
+  
+  micAnalyzer = new Amplitude(this);
+  micAnalyzer.input(in);
+  
   song1 = new SoundFile(this, "peaches_loud.wav");
-  song1.loop();
+  //song1.loop();
   
   song2 = new SoundFile(this, "533847__tosha73__distortion-guitar-power-chord-e.wav");
-  song2.loop();
+  //song2.loop();
   
   song3 = new SoundFile(this, "sondidoOrbitas.wav");
-  song3.loop(); 
+  //song3.loop(); 
   
   song4 = new SoundFile(this, "breathy-vocal-yo.wav");
-  song4.loop(); 
+  //song4.loop(); 
   
    // create a new Amplitude analyzer
   analyzer = new Amplitude(this);
@@ -164,12 +179,23 @@ boolean playing1 = true;
 boolean playing2 = true;
 boolean playing3 = true;
 boolean playing4 = true;
+float volMic;
 
-void draw() { //<>//
+void captureEvent(Capture video) {
+  // Read image from the camera
+  video.read();
+}
+
+void draw() {
   
   background(0);
   
+  //video.loadPixels();
+  //image(video,0,0);
   
+  volMic = micAnalyzer.analyze();
+  camera(width/2, height/2, (height/2) / tan(PI/6) + volMic * 2000, width/2, height/2, 0, 0, 1, 0);
+
   
   // Parte del centro
   
@@ -186,7 +212,7 @@ void draw() { //<>//
     stars.removeIf(star -> !star.is_active());
     
     while (stars.size() < NUM_STARS) {
-         //<>//
+        
         stars.add(new Star(random(width), random(height)));
     }
   }
@@ -213,6 +239,7 @@ void draw() { //<>//
     }  
     
   }
+  
   
   // Si no hay nada rotando actualmente
   
@@ -289,6 +316,8 @@ void draw() { //<>//
     
     
   }
+  
+
   
   // Cuando haya rotacion
   
