@@ -33,7 +33,7 @@ class Star {
     void corre() {
       
         stroke(random(255), random(255), random(255));
-        strokeWeight(3);
+        strokeWeight(5);
         line(pos.x, pos.y, prev_pos.x, prev_pos.y);
     }
 }

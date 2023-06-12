@@ -39,8 +39,8 @@ float radio = 200;
 
 // Se inicializan los colores
 
-int saturation = 60;
-int brightness = 80;
+int saturation = 85;
+int brightness = 150;
 
 float [] colors = new float[num_circles];
 
