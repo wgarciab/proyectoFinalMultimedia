@@ -7,6 +7,7 @@ class CircleItem{
   // Posicion actual
   public int xPos = 0;
   public int yPos = 0;
+  public int zPos = 0;
     
   public float angulo = 0;
   
@@ -37,10 +38,11 @@ class CircleItem{
   
   // Para dibujar cada circulo
   
-  public CircleItem(int xPos, int yPos, float c){
+  public CircleItem(int xPos, int yPos, int zPos, float c){
         
     this.xPos = xPos;
     this.yPos = yPos;
+    this.zPos = zPos;
     this.c = c+1-1;
     this.cInit = c+1-1;
     
@@ -60,7 +62,7 @@ class CircleItem{
     //circle(this.xPos, this.yPos, 40 + vol*50);
     
     pushMatrix();
-    translate(this.xPos, this.yPos, 0);
+    translate(this.xPos, this.yPos, this.zPos);
     lights();
     sphere(20 + vol*20);
     popMatrix();

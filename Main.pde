@@ -36,7 +36,7 @@ int prevCircleId2;
 
 // Numero de circulos a dibujar
 
-int num_circles = 12;
+int num_circles = 6;
 
 // Radio inicial
 
@@ -59,7 +59,7 @@ ArrayList <CircleItem> items = new ArrayList <CircleItem> ();
 
 ArrayList <OrbitItem> orbitItems = new ArrayList <OrbitItem> ();
 
-int [][] posicionesIniciales = new int[num_circles][];
+int [][] posicionesIniciales = new int[num_circles*num_circles][];
 
 // Numero de pasos para dar la vuelta para cada par de circulos
 
@@ -147,21 +147,24 @@ void setup() {
   
   int counterPos = 0;
   
-  for(int i=0; i < 360 ; i += int(360/num_circles)){
-            
-    int xPos = int(radio*cos(i*(PI/180)));
-    int yPos = int(radio*sin(i*(PI/180)));
-    
-    int[] temp = new int[] {xPos, yPos};
-            
-    posicionesIniciales[counterPos] = (temp);
-    
-    counterPos++;
-        
-    CircleItem ci = new CircleItem(xPos, yPos, colors[(colorsIterator)%colors.length]+1-1);
-    
-    colorsIterator++;
-    
+  for (int i = 0; i < num_circles; i++){
+    float theta = map(i, 0, num_circles, 0, TWO_PI);
+    for (int j = 0; j < num_circles; j++){
+      float phi = map(j, 0, num_circles, 0, PI);
+      int xPos = int(radio*sin(phi)*cos(theta));
+      int yPos = int(radio*sin(phi)*sin(theta));
+      int zPos = int(radio*cos(phi));
+      
+      int[] temp = new int[] {xPos, yPos, zPos};
+              
+      posicionesIniciales[counterPos] = (temp);
+      
+      counterPos++;
+          
+      CircleItem ci = new CircleItem(xPos, yPos, zPos, colors[(colorsIterator)%colors.length]+1-1);
+      
+      colorsIterator++;
+    }
   }
   
   frameRate(100);
@@ -212,9 +215,11 @@ void draw() { //<>//
   
   
   translate(centerXTranslate, centerYTranslate);
+  //rotateX(frameCount * 0.01);
+  //rotateY(frameCount * 0.01);
   rotateX(xRotation);
   rotateY(yRotation);
-  rotateZ(zRotation);
+  //rotateZ(zRotation);
 
   
   if (mousePressed == true && playing1 == true){
