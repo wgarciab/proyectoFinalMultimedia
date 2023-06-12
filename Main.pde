@@ -14,6 +14,8 @@ SoundFile song4;
 Amplitude analyzer;
 Amplitude micAnalyzer;
 
+//comentario
+
 // Estrellas
 int NUM_STARS = 50;
 ArrayList<Star> stars = new ArrayList<Star>();
@@ -184,9 +186,9 @@ void draw() { //<>//
     }
     
     stars.removeIf(star -> !star.is_active());
-    
+     //<>//
     while (stars.size() < NUM_STARS) {
-         //<>//
+        
         stars.add(new Star(random(width), random(height)));
     }
   }
