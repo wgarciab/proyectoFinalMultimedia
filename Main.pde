@@ -4,7 +4,11 @@ import processing.sound.*;
 //Importación de la librería de osc
 import netP5.*;
 import oscP5.*;
+
+//Librerias para la camara
 import processing.video.*;
+import gab.opencv.*;
+import java.awt.Rectangle;
 
 // A Sample object (for a sound)
 SoundFile song1;
@@ -15,7 +19,9 @@ SoundFile song4;
 Amplitude analyzer;
 Amplitude micAnalyzer;
 AudioIn audioIn;
-//Capture videoCapture;
+Capture videoCapture;
+OpenCV opencv;
+Rectangle[] faces;
 
 
 // Estrellas
@@ -97,24 +103,30 @@ void setup() {
   OscP5 oscP5 = new OscP5(this, 11111);
   
   song1 = new SoundFile(this, "peaches_loud.wav");
-  song1.loop();
+  //song1.loop();
   
   song2 = new SoundFile(this, "533847__tosha73__distortion-guitar-power-chord-e.wav");
-  song2.loop();
+  //song2.loop();
   
   song3 = new SoundFile(this, "sondidoOrbitas.wav");
-  song3.loop(); 
+  //song3.loop(); 
   
   song4 = new SoundFile(this, "breathy-vocal-yo.wav");
-  song4.loop(); 
+  //song4.loop(); 
   
   audioIn = new AudioIn(this,0);
   // this is how we intialyzed the reading of the voice 
   audioIn.start();
   
+  
   //Initialize camara recording variable
-  //videoCapture = new Capture(this,width, height);
-  //videoCapture.start();
+  videoCapture = new Capture(this,width, height);
+  videoCapture.start();
+  
+  //Libreria opencv para detectar rostros
+  opencv = new OpenCV(this, width, height);
+  opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE); 
+  
   
    // create a new Amplitude analyzer
   analyzer = new Amplitude(this);
@@ -157,7 +169,7 @@ void setup() {
     posicionesIniciales[counterPos] = (temp);
     
     counterPos++;
-        
+         //<>//
     CircleItem ci = new CircleItem(xPos, yPos, colors[(colorsIterator)%colors.length]+1-1);
     
     colorsIterator++;
@@ -168,16 +180,17 @@ void setup() {
    //<>//
   centerXTranslate = width/2;
   centerYTranslate = height/2;
-  
+   //<>//
   bound_min = int(radio) + circle_size;
   bound_max = width - int(radio) - circle_size;
-
+ //<>//
 }
 
 boolean playing1 = true;
 boolean playing2 = true;
 boolean playing3 = true; //<>//
 boolean playing4 = true;
+boolean camera = false;
 
 void draw() { //<>//
   
@@ -187,9 +200,26 @@ void draw() { //<>//
   float microPhoneVolumen =micAnalyzer.analyze();
   camera(width/2, height/2, (height/2) / tan(PI/6)+microPhoneVolumen*2000, width/2, height/2, 0, 0, 1, 0);
   
-  //process the video capture from the camara
-  // videoCapture.loadPixels();
-   //image(videoCapture,0,0);
+  if (camera == true) {
+    //process the video capture from the camara
+    //videoCapture.loadPixels();
+    image(videoCapture,0,0,0,0);
+     
+    //empezamos a detectar rostros
+    if (videoCapture.available()) {
+      videoCapture.read(); //<>//
+      opencv.loadImage(videoCapture);
+    }
+    opencv.detect();
+    faces = opencv.detect();
+    
+    //trasladamos el centro segun el rostro
+    
+    if (faces.length > 0) {
+      centerXTranslate = int(faces[0].x + faces[0].width / 2);
+      centerYTranslate = int(faces[0].y + faces[0].height / 2);
+    }
+  }
   
   // Parte del centro
   float acc = map(mouseX, 0, width, 0.005f, 0.2f);
@@ -237,9 +267,37 @@ void draw() { //<>//
   
   if (cur_rotating == false && playing3 == true){
     
-     float temp = random(0, 1);
+    float temp = random(0, 1);
       
-      speed = steps/1.5;
+    //speed = steps/1.5;
+    if (temp <= 0.2) {
+      
+      speed = steps/4;
+      
+    }
+    else if (temp <= 0.4) {
+      
+      speed = steps/3;
+      
+    }
+    
+    else if (temp <= 0.6) {
+      
+      speed = steps/2;
+      
+    }
+    
+    else if (temp <= 0.8) {
+      
+      speed = steps;
+      
+    }
+    
+    else {
+      
+      speed = steps*2;
+      
+    }
   
     
     checkDescuadre ++;
@@ -435,6 +493,15 @@ void keyPressed() {
       playing4 = true;
     }
     
+  }
+  
+  if (key == 'c' || key == 'C'){
+    if (camera){
+      camera = false;
+    }
+    else{
+      camera = true;
+    }
   }
 }
 
