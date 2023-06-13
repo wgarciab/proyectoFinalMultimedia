@@ -192,22 +192,29 @@ boolean playing3 = true; //<>//
 boolean playing4 = true;
 boolean camera = false;
 
+float backgroundColor = 0;
+float h = 360;
+float s = 100;
+float b = 100;
+
 void draw() { //<>//
   
-  background(0);
+  background(backgroundColor);
+  
+  
   //This two lines make the actual readd of the audio and then 
   // zoom the camara in and out accordign to the intesity of tha audio.
   float microPhoneVolumen =micAnalyzer.analyze();
   camera(width/2, height/2, (height/2) / tan(PI/6)+microPhoneVolumen*2000, width/2, height/2, 0, 0, 1, 0);
   
-  if (camera == true) {
+  if (camera == true) { //<>//
     //process the video capture from the camara
     //videoCapture.loadPixels();
     image(videoCapture,0,0,0,0);
      
     //empezamos a detectar rostros
     if (videoCapture.available()) {
-      videoCapture.read(); //<>//
+      videoCapture.read();
       opencv.loadImage(videoCapture);
     }
     opencv.detect();
@@ -534,6 +541,10 @@ void oscEvent(OscMessage oscMessage) {
       yRotation = oscMessage.get(0).floatValue();
     }
     
+    else if(oscMessage.checkAddrPattern("/oscControl/slider1")){
+      backgroundColor = oscMessage.get(0).floatValue() * 360;
+    }
+       
     
   }
  /** 
