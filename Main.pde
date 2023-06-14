@@ -15,6 +15,8 @@ SoundFile song1;
 SoundFile song2;
 SoundFile song3;
 SoundFile song4;
+SoundFile song5;
+SoundFile song6;
 
 Amplitude analyzer;
 Amplitude micAnalyzer;
@@ -43,10 +45,12 @@ int prevCircleId2;
 // Numero de circulos a dibujar
 
 int num_circles = 12;
+int num_circles_sphere = 5;
 
 // Radio inicial
 
 float radio = 200;
+float radioEsfera = 100;
 
 // Se inicializan los colores
 
@@ -60,6 +64,10 @@ int colorsIterator = 0;
 // Se crea la lista donde se guardaran los circulos
 
 ArrayList <CircleItem> items = new ArrayList <CircleItem> ();
+
+// Se crea la lista donde se guardaran la esfera
+
+ArrayList <SphereItem> sphereItems = new ArrayList <SphereItem> ();
 
 // Se crea la lista donde se guardaran las orbitas
 
@@ -102,17 +110,25 @@ void setup() {
   
   OscP5 oscP5 = new OscP5(this, 11111);
   
+  //sonido cambio de posicion
   song1 = new SoundFile(this, "peaches_loud.wav");
   //song1.loop();
   
+  //sonido circulos
   song2 = new SoundFile(this, "533847__tosha73__distortion-guitar-power-chord-e.wav");
-  //song2.loop();
+  song2.loop();
   
+  //sonido orbitas
   song3 = new SoundFile(this, "sondidoOrbitas.wav");
-  //song3.loop(); 
+  song3.loop(); 
   
-  song4 = new SoundFile(this, "breathy-vocal-yo.wav");
-  //song4.loop(); 
+  //sonido estrellas
+  song4 = new SoundFile(this, "mixkit-arcade-video-game-machine-alert-2821 (mp3cut.net).wav");
+  song4.loop();
+  
+  //sonido esfera
+  song5 = new SoundFile(this, "cartoon-jump-6462.wav");
+  song6 = new SoundFile(this, "interface-124464.wav");
   
   audioIn = new AudioIn(this,0);
   // this is how we intialyzed the reading of the voice 
@@ -153,7 +169,7 @@ void setup() {
   
   for (int i=0; i < num_circles; i++) {
     colors[i] = int(random(0, 359));
-  }
+  } //<>//
   
   // Creacion circulos
   
@@ -164,26 +180,41 @@ void setup() {
     int xPos = int(radio*cos(i*(PI/180)));
     int yPos = int(radio*sin(i*(PI/180)));
     
-    int[] temp = new int[] {xPos, yPos};
+    int[] temp = new int[] {xPos, yPos}; //<>//
             
     posicionesIniciales[counterPos] = (temp);
-    
+     //<>//
     counterPos++;
-         //<>//
+        
     CircleItem ci = new CircleItem(xPos, yPos, colors[(colorsIterator)%colors.length]+1-1);
     
     colorsIterator++;
     
   }
   
-  frameRate(100);
+  // creacion esfera
+  for (int i = 0; i < num_circles_sphere; i++){
+    float theta = map(i, 0, num_circles_sphere, 0, TWO_PI);
+    for (int j = 0; j < num_circles_sphere; j++){
+      float phi = map(j, 0, num_circles_sphere, 0, PI);
+      int xPos = int(radioEsfera*sin(phi)*cos(theta));
+      int yPos = int(radioEsfera*sin(phi)*sin(theta));
+      int zPos = int(radioEsfera*cos(phi));
+          
+      SphereItem ci = new SphereItem(xPos, yPos, zPos, colors[(colorsIterator)%colors.length]+1-1);
+      
+      colorsIterator++;
+    }
+  }
+  
+  frameRate(100); //<>//
    //<>//
   centerXTranslate = width/2;
   centerYTranslate = height/2;
-   //<>//
+  
   bound_min = int(radio) + circle_size;
   bound_max = width - int(radio) - circle_size;
- //<>//
+
 }
 
 boolean playing1 = true;
@@ -207,7 +238,7 @@ void draw() { //<>//
   float microPhoneVolumen =micAnalyzer.analyze();
   camera(width/2, height/2, (height/2) / tan(PI/6)+microPhoneVolumen*2000, width/2, height/2, 0, 0, 1, 0);
   
-  if (camera == true) { //<>//
+  if (camera == true) {
     //process the video capture from the camara
     //videoCapture.loadPixels();
     image(videoCapture,0,0,0,0);
@@ -422,6 +453,12 @@ void draw() { //<>//
     
   }
   
+  for (SphereItem item : sphereItems){
+    
+    item.display();
+    
+  }
+  
   // Set the volume to a range between 0 and 1.0
   float volume = map(centerXTranslate, bound_min, bound_max, 0, 1);
   song1.amp(volume);
@@ -510,6 +547,29 @@ void keyPressed() {
       camera = true;
     }
   }
+  
+  if (key == CODED) {
+    if (keyCode == UP) {
+      song5.play();
+      num_circles_sphere++;
+      actualizarEsfera();
+
+    } else if (keyCode == DOWN) {
+      song5.play();
+      num_circles_sphere--;
+      actualizarEsfera();
+
+    } else if (keyCode == LEFT) {
+      song6.play();
+      radioEsfera-=20;
+      actualizarEsfera();
+      
+    } else if (keyCode == RIGHT) {
+      song6.play();
+      radioEsfera+=20;
+      actualizarEsfera();
+    }
+  }
 }
 
 void oscEvent(OscMessage oscMessage) {
@@ -553,3 +613,22 @@ void oscEvent(OscMessage oscMessage) {
   video.read();
 }
 **/
+
+void actualizarEsfera() {
+  
+  sphereItems.clear();
+  
+  for (int i = 0; i < num_circles_sphere; i++){
+    float theta = map(i, 0, num_circles_sphere, 0, TWO_PI);
+    for (int j = 0; j < num_circles_sphere; j++){
+      float phi = map(j, 0, num_circles_sphere, 0, PI);
+      int xPos = int(radioEsfera*sin(phi)*cos(theta));
+      int yPos = int(radioEsfera*sin(phi)*sin(theta));
+      int zPos = int(radioEsfera*cos(phi));
+          
+      SphereItem ci = new SphereItem(xPos, yPos, zPos, colors[(colorsIterator)%colors.length]+1-1);
+      
+      colorsIterator++;
+    }
+  }
+}
